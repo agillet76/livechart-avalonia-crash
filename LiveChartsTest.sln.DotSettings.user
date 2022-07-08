@@ -1,0 +1,16 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Volker Kilian\.nuget\packages\dynamicdata\7.9.4\lib\net6.0\DynamicData.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fd06a61d_002D37f5_002D481c_002Dae93_002D6f71d7012210/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.Configuration.ConfigurationTests.TestBasicConfig&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.Configuration.ConfigurationTests.TestMultipleDevicesOfSameType&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.Configuration.ConfigurationTests.TestListTypes&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.Fluidics.PressureControllerTests.TestDevice&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.PressureControllerTests.TestDevice&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.PressureControllerTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::0B067BDF-50A0-4CD0-B3FB-1F8A6414D15A::net6.0::ICS.DevicesTests.MicroscopeStateTests.TestStateManagement&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=autofac/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

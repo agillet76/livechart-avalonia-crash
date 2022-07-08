@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:LiveChartsCore.SkiaSharpView.Avalonia;assembly=LiveChartsCore.SkiaSharpView.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TestLiveCharts.Views.DataView">
+
+	
+	
+	<Border BorderBrush="Black" BorderThickness="1">
+		<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto"  >
+			<TextBlock Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Text="{Binding CurrentValue, StringFormat={}{0:F2}}" HorizontalAlignment="Center" FontWeight="Bold" />
+			
+			<avalonia:CartesianChart Grid.Row="3" Grid.Column="0"   Width="200" Height="100" Series="{Binding SeriesData}"
+									 XAxes="{Binding XAxes}" YAxes="{Binding YAxes}" FontSize="8" SyncContext="{Binding Sync}" TooltipPosition="Hidden" />
+
+		</Grid>
+	</Border>
+</UserControl>
