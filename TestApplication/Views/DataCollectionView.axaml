@@ -16,6 +16,11 @@
                         <views:DataControllerView HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Grid>
                 </TabItem>
+                <TabItem Header="FPGA Time Trace" VerticalContentAlignment="Center">
+                    <Grid RowDefinitions="*,Auto">
+                        <views:FpgaChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    </Grid>
+                </TabItem>
 
             </TabControl>
         </Border>

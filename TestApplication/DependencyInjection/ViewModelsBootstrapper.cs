@@ -1,8 +1,10 @@
 
 using Autofac;
+
 using ReactiveUI;
 using TestLiveCharts.ViewModels;
 using TestLiveCharts.Views;
+
 
 namespace TestLiveCharts.DependencyInjection;
 
@@ -18,5 +20,7 @@ public static class ViewModelsBootstrapper
         builder.RegisterType<DataControllerViewModel>().SingleInstance();
         builder.RegisterType<DataCollectionView>().As<IViewFor<DataCollectionViewModel>>();
         builder.RegisterType<DataCollectionViewModel>().SingleInstance();
+        builder.RegisterType<FpgaChartView>().As<IViewFor<FpgaChartViewModel>>();
+        builder.RegisterType<FpgaChartViewModel>().SingleInstance();
     }
 }
