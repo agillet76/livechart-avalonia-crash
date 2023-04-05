@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace TestLiveCharts.Models;
 
@@ -12,10 +15,10 @@ namespace TestLiveCharts.Models;
 //  5-8 - PMTs(Pre-Median Filter) (Volts)
 //  9-12 - Analog Output Channels(Volts)
 //  13-20 - Digital TTL Outputs(as 0 or 1)
-public class TimeTraceData
+public class TimeTraceData:ReactiveObject
 {
-    public double TimestampMs { get; set; }
-    public List<double> PMTsVolts { get; set; } = new();
+    [Reactive] public double TimestampMs { get; set; }
+    [Reactive] public ObservableCollection<double> PMTsVolts { get; set; } = new();
     public List<double> PreFilterPMTsVolts { get; set; } = new();
     public List<double> AnalogOutputChannlesVolts { get; set; } = new();
     public List<bool> DigitalTTLOutputs { get; set; } = new();

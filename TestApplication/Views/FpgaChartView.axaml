@@ -27,18 +27,21 @@
 
         
             <Border BorderBrush="White"   Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="2" Margin="10">
-                <lvc:CartesianChart Width="1280" Height="480" Margin="10,0" HorizontalAlignment="Left"
+				<lvc:CartesianChart Width="1280" Height="640" Margin="10,0" HorizontalAlignment="Left"
                                     ZoomMode="None" EasingFunction="{x:Null}"
                                     Series="{Binding DataSeries}"
                                     DrawMarginFrame="{Binding DrawMarginFrame}"
                                     XAxes="{Binding XAxes}"
                                     YAxes="{Binding YAxes}"
-                                    SyncContext="{Binding DataSync}"
                                     FontSize="10"
-                                    LegendPosition="Right" 
+                                    LegendPosition="Right"
                                     TooltipPosition="Hidden"
-                                    UpdaterThrottler="00:00:00.500"
-                                    AnimationsSpeed="00:00:00.300"/>
+                                    SyncContext="{Binding DataSync}"
+                                    />
+				<!--  UpdaterThrottler="00:00:00.500"
+                                    AnimationsSpeed="00:00:00.300"
+									/> 
+									-->
             </Border>
 
 

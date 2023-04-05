@@ -9,8 +9,8 @@ namespace TestLiveCharts.Models;
 
 public class SimulatedFpga : IFpgaDataProvider, IDisposable
 {
-    private int TimeTraceLength = 10000;
-    private int DataPollingIntervalMs = 100;
+    private int TimeTraceLength = 1000;
+    private int DataPollingIntervalMs = 500;
 
     private Stopwatch _runtimeWatch = new();
     protected System.Timers.Timer _pollingTimer;
@@ -23,7 +23,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
 
     public bool Disposed { get; private set; }
 
-
+    private int _timestampStart = 0;
     public bool IsConnected
     {
         get => _isConnected;
@@ -121,6 +121,8 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             for (int i = 0; i < TimeTraceLength; i++)
             {
                 var timeTraceData = GetTimeTraceData();
+                timeTraceData.TimestampMs = _timestampStart;
+                _timestampStart++;
                 convertedDataList.Add(timeTraceData);
             }
             TimeTraceDataList.AddRange(convertedDataList);
@@ -140,7 +142,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         // 9 - 12 - Analog Output Channels(Volts)
         // 13 - 20 - Digital TTL Outputs(as 0 or 1)
         var timeTraceData = new TimeTraceData();
-        timeTraceData.TimestampMs = DateTime.Now.ToOADate();
+        
         for (var i = 0; i < PmtChannelCount; i++)
         {
             var val = Math.Round(_random.NextDouble(), 2);
