@@ -19,9 +19,17 @@
             <Button x:Name="DisconnectButton" Content="Disconnect"
                     Command="{Binding DisconnectCommand}"
                     HorizontalContentAlignment="Center" Width="100" Margin="15,20"/>
+
+			<Label Content="TimeTraceLength:" VerticalAlignment="Center" Margin="15,0"/>
+            <TextBox Text="{Binding Fpga.TimeTraceLength}" 
+                     IsEnabled="{Binding !IsConnected }"
+                     Width="100" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="5,0"/>
             
+
             <Label Content="Runtime:" VerticalAlignment="Center" Margin="15,0"/>
-            <TextBox Text="{Binding Fpga.RuntimeInSeconds, StringFormat={}{0:F2}, Mode=OneWay}" Width="100" VerticalAlignment="Center" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Margin="5,0"/>
+            <TextBox Text="{Binding Fpga.RuntimeInSeconds, StringFormat={}{0:F2}, Mode=OneWay}" 
+                     Width="100" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                     HorizontalContentAlignment="Right" Margin="5,0"/>
             <Label Content="seconds" VerticalAlignment="Center" />
         </StackPanel>
 
@@ -33,6 +41,7 @@
                                     DrawMarginFrame="{Binding DrawMarginFrame}"
                                     XAxes="{Binding XAxes}"
                                     YAxes="{Binding YAxes}"
+                                    Title="{Binding Title}"
                                     FontSize="10"
                                     LegendPosition="Right"
                                     TooltipPosition="Hidden"
