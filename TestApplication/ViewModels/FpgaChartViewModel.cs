@@ -12,6 +12,8 @@ using LiveChartsCore.SkiaSharpView.Painting.Effects;
 using TestLiveCharts.Models;
 using System.Reactive;
 using ReactiveUI.Fody.Helpers;
+using LiveChartsCore.Drawing;
+using LiveChartsCore.SkiaSharpView.VisualElements;
 
 namespace TestLiveCharts.ViewModels;
 
@@ -19,87 +21,113 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
 {
     public object DataSync { get; set; }
     public ViewModelActivator Activator { get; }
-    public RangeObservableCollection<TimeTraceData> _latestData = new();
+    public ObservableCollection<TimeTraceData[]> _latestData { get; set; } = new ();
+
+    protected ObservableAsPropertyHelper<bool> isConnected; 
+    public bool IsConnected => isConnected.Value;
+
     public DrawMarginFrame DrawMarginFrame => new DrawMarginFrame
     {
         Fill = new SolidColorPaint(SKColors.LightSlateGray),
         Stroke = new SolidColorPaint(SKColors.Black, 3),
 
     };
+
+
+    private static int _strokeThickness = 1;
+    private static float[] _strokeDashArray = new float[] { 3 * _strokeThickness, 2 * _strokeThickness };
+    private DashEffect _effect = new DashEffect(_strokeDashArray);
+
+
     public ObservableCollection<ISeries> DataSeries { get; set; } = new ObservableCollection<ISeries>
     {
         new LineSeries<TimeTraceData>
         {
             Name = "PMT1",
             Fill = null,
-            Stroke = new SolidColorPaint(SKColors.LightGreen,3),
+            DataPadding = new LvcPoint(0.2f, 0),
+            Stroke = null,
+            // Stroke = new SolidColorPaint  {
+            //     Color = SKColors.LightGreen,
+            //     StrokeCap = SKStrokeCap.Round,
+            //     StrokeThickness = _strokeThickness,
+            //     PathEffect = new DashEffect(_strokeDashArray)
+            // },
+      
             GeometryStroke =  new SolidColorPaint(SKColors.LightGreen,1),
-            GeometrySize = 1,
+            LineSmoothness = 1,
+            GeometrySize = 5,
             Mapping = (data, point) =>
             {
                 // use the Population property in this series
                 point.PrimaryValue = data.PMTsVolts[0];
-                point.SecondaryValue = point.Context.Index;
+                //point.SecondaryValue = point.Context.Index;
+                point.SecondaryValue = data.TimestampMs;
             },
-            
         },
-        new LineSeries<TimeTraceData>
-        {
-            Name = "PMT2",
-            Fill = null,
-            Stroke = new SolidColorPaint(SKColors.LightBlue,3),
-            GeometryStroke =  new SolidColorPaint(SKColors.LightBlue,1),
-            GeometrySize = 1,
-            Mapping = (data, point) =>
-            {
-                // use the Population property in this series
-                point.PrimaryValue = data.PMTsVolts[1];
-                point.SecondaryValue = point.Context.Index;
-            }
-        },
-        new LineSeries<TimeTraceData>
-        {
-            Name = "Pre Filter PMT1",
-            Fill = null,
-            Stroke = new SolidColorPaint(SKColors.LightSalmon,3),
-            GeometryStroke =  new SolidColorPaint(SKColors.LightSalmon,1),
-            GeometrySize = 1,
-            Mapping = (data, point) =>
-            {
-                // use the Population property in this series
-                point.PrimaryValue = data.PreFilterPMTsVolts[0];
-                point.SecondaryValue = point.Context.Index;
-            }
-        },
-        new LineSeries<TimeTraceData>
-        {
-            Name = "Pre Filter PMT2",
-            Fill = null,
-            Stroke = new SolidColorPaint(SKColors.LightYellow,3),
-            GeometryStroke =  new SolidColorPaint(SKColors.LightYellow,1),
-            GeometrySize = 1,
-            Mapping = (data, point) =>
-            {
-                // use the Population property in this series
-                point.PrimaryValue = data.PreFilterPMTsVolts[1];
-                point.SecondaryValue = point.Context.Index;
-            }
-        },
-        new LineSeries<TimeTraceData>
-        {
-            Name = "Analog Out 1",
-            Fill = null,
-            Stroke = new SolidColorPaint(SKColors.LightPink,3),
-            GeometryStroke =  new SolidColorPaint(SKColors.LightPink,1),
-            GeometrySize = 1,
-            Mapping = (data, point) =>
-            {
-                // use the Population property in this series
-                point.PrimaryValue = data.AnalogOutputChannlesVolts[0];
-                point.SecondaryValue = point.Context.Index;
-            }
-        },
+        // new LineSeries<TimeTraceData>
+        // {
+        //     Name = "PMT2",
+        //     Fill = null,
+        //     Stroke = new SolidColorPaint(SKColors.LightBlue,3),
+        //     GeometryStroke =  new SolidColorPaint(SKColors.LightBlue,1),
+        //     GeometrySize = 1,
+        //     Mapping = (data, point) =>
+        //     {
+        //         // use the Population property in this series
+        //         point.PrimaryValue = data.PMTsVolts[1];
+        //         point.SecondaryValue = data.TimestampMs;
+        //         
+        //     }
+        // },
+        // new LineSeries<TimeTraceData>
+        // {
+        //     Name = "Pre Filter PMT1",
+        //     Fill = null,
+        //     Stroke = new SolidColorPaint(SKColors.LightSalmon,3),
+        //     GeometryStroke =  new SolidColorPaint(SKColors.LightSalmon,1),
+        //     GeometrySize = 1,
+        //     Mapping = (data, point) =>
+        //     {
+        //         // use the Population property in this series
+        //         point.PrimaryValue = data.PreFilterPMTsVolts[0];
+        //         point.SecondaryValue = data.TimestampMs;
+        //         //point.SecondaryValue = point.Context.Index;
+        //     }
+        // },
+        // new LineSeries<TimeTraceData>
+        // {
+        //     Name = "Pre Filter PMT2",
+        //     Fill = null,
+        //     Stroke = new SolidColorPaint(SKColors.LightYellow,3),
+        //     GeometryStroke =  new SolidColorPaint(SKColors.LightYellow,1),
+        //     GeometrySize = 1,
+        //     Mapping = (data, point) =>
+        //     {
+        //         // use the Population property in this series
+        //         point.PrimaryValue = data.PreFilterPMTsVolts[1];
+        //         point.SecondaryValue = data.TimestampMs;
+        //         //point.SecondaryValue = point.Context.Index;
+        //     }
+        // },
+        // new LineSeries<TimeTraceData>
+        // {
+        //     Name = "Analog Out 1",
+        //     Fill = null,
+        //     Stroke = new SolidColorPaint(SKColors.LightPink,3),
+        //     GeometryStroke =  new SolidColorPaint(SKColors.LightPink,1),
+        //     GeometrySize = 1,
+        //     Mapping = (data, point) =>
+        //     {
+        //         // use the Population property in this series
+        //         point.PrimaryValue = data.AnalogOutputChannlesVolts[0];
+        //         point.SecondaryValue = data.TimestampMs;
+        //         //point.SecondaryValue = point.Context.Index;
+        //     }
+        // },
     };
+
+    [Reactive]
     public List<Axis> XAxes { get; set; } = new List<Axis>
     {
         new Axis
@@ -134,25 +162,41 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
         }
     };
 
-    public ReactiveCommand<Unit, Task> ConnectCommand { get; }
-    public ReactiveCommand<Unit, Task> DisconnectCommand { get; }
+    [Reactive]
+    public LabelVisual Title { get; set; } =
+        new LabelVisual
+        {
+            Text = "Time Series Data",
+            TextSize = 25,
+            Padding = new Padding(15),
+            Paint = new SolidColorPaint(SKColors.White)
+        };
+
+    public ReactiveCommand<Unit, Unit> ConnectCommand { get; }
+    public ReactiveCommand<Unit, Unit> DisconnectCommand { get; }
 
     [Reactive] public IFpgaDataProvider Fpga { get; set; }
+    [Reactive] public double XMaxLimit { get; set; } = 1;
+    [Reactive] public double XMinLimit { get; set; } = 0;
+
+    private Stopwatch _sw = new Stopwatch();
 
     public FpgaChartViewModel()
     {
         Activator = new ViewModelActivator();
         Fpga = new SimulatedFpga();
 
-        var isConnected = this.WhenAnyValue(x => x.Fpga.IsConnected).ObserveOn(RxApp.MainThreadScheduler);
-       
-        ConnectCommand = ReactiveCommand.Create(async () =>
+        var isConnectedObs = this.WhenAnyValue(x => x.Fpga.IsConnected).ObserveOn(RxApp.MainThreadScheduler);
+        isConnected = isConnectedObs.ToProperty(this, x => x.IsConnected);
+
+        ConnectCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             try
             {
                 await Task.Run(() =>
                 {
                     Fpga.Connect();
+                    _sw.Restart();
 
                 }).ConfigureAwait(true);
             }
@@ -160,15 +204,18 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
             {
                 Console.Error.WriteLine("Failed Start Monitoring");
             }
-        }, isConnected.Select(x => !x));
+        }, isConnectedObs.Select(x => !x));
 
-        DisconnectCommand = ReactiveCommand.Create(async () =>
+        DisconnectCommand = ReactiveCommand.CreateFromTask(async () =>
         {
             try
             {
                 await Task.Run(() =>
                 {
+                   
                     Fpga.Disconnect();
+                    _sw.Stop();
+                    _latestData.Clear();
 
                 }).ConfigureAwait(true);
             }
@@ -176,83 +223,36 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
             {
                 Console.Error.WriteLine("Failed Stop Monitoring");
             }
-        }, isConnected);
+        }, isConnectedObs);
 
         //https://stackoverflow.com/questions/63138397/livecharts-wpf-slow-with-live-data-improve-livecharts-real-time-plotting-perfor
         // https://www.reactiveui.net/docs/handbook/collections/
         // https://stackoverflow.com/questions/60330908/observablechangeset-wait-until-list-is-ready-before-watching
-        DataSync = _latestData;
-        DataSeries[0].Values = _latestData;
-        DataSeries[1].Values = _latestData;
-        DataSeries[2].Values = _latestData;
-        DataSeries[3].Values = _latestData;
-        DataSeries[4].Values = _latestData;
 
-        // var t = Fpga.ConnectToData()
-        //     .ObserveOn(RxApp.MainThreadScheduler)
-        //     .Throttle(TimeSpan.FromSeconds(1))
-        //     .Bind(out _items);
+        var t = Fpga.TimeTraceDataList
+            // Convert the collection to a stream of chunks,
+            // so we have IObservable<IChangeSet<TKey, TValue>>
+            // type also known as the DynamicData monad.
+            .ToObservableChangeSet().Sample(TimeSpan.FromSeconds(1)).Select(x => x)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .SubscribeOn(RxApp.MainThreadScheduler);
 
         this.WhenActivated(async (CompositeDisposable disposables) =>
         {
-
-            // t.Subscribe(x =>
-            // {
-            //     lock (DataSync)
-            //     {
-            //         _latestData.Add(_items.Last());
-            //         
-            //         if (_latestData.Count > _keepDataRecords)
-            //             _latestData.RemoveAt(0);
-            //     }
-            // }).DisposeWith(disposables);
-
-
-
-
-            // var t = Fpga.TimeTraceDataList
-            //     // Convert the collection to a stream of chunks,
-            //     // so we have IObservable<IChangeSet<TKey, TValue>>
-            //     // type also known as the DynamicData monad.
-            //     .ToObservableChangeSet(x => x)
-            //     .ObserveOn(RxApp.MainThreadScheduler);
-            // t.Subscribe(_ =>
-            // {
-            //     Log.Debug($"Adding to Chart");
-            //     lock (DataSync)
-            //     {
-            //         if (Fpga.TimeTraceDataList.Any())
-            //         {
-            //             var data = Fpga.TimeTraceDataList.Last();
-            //             _latestData.Add(data);
-            //         }
-            //         if (_latestData.Count > _keepDataRecords)
-            //             _latestData.RemoveAt(0);
-            //     }
-            // }).DisposeWith(disposables);
-
-            var t = Fpga.TimeTraceDataList
-                // Convert the collection to a stream of chunks,
-                // so we have IObservable<IChangeSet<TKey, TValue>>
-                // type also known as the DynamicData monad.
-                .ToObservableChangeSet().Sample(TimeSpan.FromSeconds(1)).Select(x=>x)
-                .ObserveOn(RxApp.MainThreadScheduler);
-
             t.Subscribe(c =>
             {
-                var sw = Stopwatch.StartNew();
-               //Log.Debug($"Adding to Chart, totalchanges{c.TotalChanges}");
                 if (c.Count > 0)
                 {
-                    var newItems = c.AsEnumerable().FirstOrDefault().Range.ToList();
-                    lock (DataSync)
+                    var newItems = Fpga.TimeTraceDataList.LastOrDefault();
+
+                    if (newItems != null)
                     {
-                        _latestData.Clear();
-                        _latestData.AddRange(newItems);
+                        DataSeries[0].Values = newItems;
+                        XAxes[0].MinLimit = newItems.First().TimestampMs;
+                        XAxes[0].MaxLimit = newItems.Last().TimestampMs;
+                        Console.Error.WriteLine($"Chart Update Trigger {_sw.ElapsedMilliseconds}");
                     }
                 }
-                sw.Stop();
-                
             }).DisposeWith(disposables);
         });
     }

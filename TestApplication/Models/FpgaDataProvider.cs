@@ -9,20 +9,29 @@ namespace TestLiveCharts.Models;
 
 public class SimulatedFpga : IFpgaDataProvider, IDisposable
 {
-    private int TimeTraceLength = 10000;
-    private int DataPollingIntervalMs = 100;
-
-    private Stopwatch _runtimeWatch = new();
-    protected System.Timers.Timer _pollingTimer;
-    // the NI FPGA is configured with 4 PMT channels PMT1, PMT2, PMT3, PMT4
-    // however we only use PMT1 and PMT2 but we need to account for all of them retrieving 
-    // data from the fpga
-    private const int PmtChannelCount = 4;
-
+   
+    private readonly int _dataPollingIntervalMs = 100;
+    private readonly int _maxDataArrayToRetain =10;
+    private readonly Stopwatch _runtimeWatch = new();
+    private readonly System.Timers.Timer _pollingTimer;
+    private int _timestampStart = 0;
     private readonly Random _random = new();
+    // FPGA is configured with 4 PMT channels PMT1, PMT2, PMT3, PMT4
+    // Ideally I will need to display data for each channel , total data points PmtChannelCount * TimeTraceLength
+    private const int PmtChannelCount = 4;
 
     public bool Disposed { get; private set; }
 
+    public int TimeTraceLength
+    {
+        get => _timeTraceLength;
+        set
+        {
+            _timeTraceLength = value;
+            OnPropertyChanged(nameof(TimeTraceLength));
+        }
+    }
+    private int _timeTraceLength = 1000;
 
     public bool IsConnected
     {
@@ -44,16 +53,15 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             OnPropertyChanged(nameof(RuntimeInSeconds));
         }
     }
-
     private double _runtimeInSeconds;
 
-    public RangeObservableCollection<TimeTraceData> TimeTraceDataList { get; set; } = new();
-    
+    public ObservableCollection<TimeTraceData[]> TimeTraceDataList { get; set; } = new();
+
 
     public SimulatedFpga() 
     {
         
-        _pollingTimer = new System.Timers.Timer(DataPollingIntervalMs)
+        _pollingTimer = new System.Timers.Timer(_dataPollingIntervalMs)
         {
             Enabled = false,
             AutoReset = true
@@ -75,11 +83,11 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             TimeTraceDataList.Clear();
            
             var sw = Stopwatch.StartNew();
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
             sw.Stop();
             RuntimeInSeconds = 0;
-            
-            _runtimeWatch.Start();
+            _timestampStart = 0;
+            _runtimeWatch.Restart();
             IsConnected = true;
             _pollingTimer.Enabled = true;
             
@@ -100,7 +108,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         {
             _pollingTimer.Enabled = false;
             // Closes and resets the FPGA device. Must be called at the end of use.
-            Thread.Sleep(3000);
+            Thread.Sleep(1000);
         }
         catch (Exception ex)
         {
@@ -108,7 +116,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         }
         finally
         {
-            _runtimeWatch.Reset();
+            _runtimeWatch.Stop();
             IsConnected = false;
         }
     }
@@ -117,13 +125,21 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
     {
         try
         {
-            var convertedDataList = new List<TimeTraceData>();
+            var convertedDataList = new TimeTraceData[TimeTraceLength];
+
+            //if (TimeTraceDataList.Count > TimeTraceLength * 10) { TimeTraceDataList.Clear(); }
             for (int i = 0; i < TimeTraceLength; i++)
             {
                 var timeTraceData = GetTimeTraceData();
-                convertedDataList.Add(timeTraceData);
+                timeTraceData.TimestampMs = _timestampStart;
+                _timestampStart++;
+                convertedDataList[i]= timeTraceData;
             }
-            TimeTraceDataList.AddRange(convertedDataList);
+            TimeTraceDataList.Add(convertedDataList);
+            if (TimeTraceDataList.Count > _maxDataArrayToRetain)
+            {
+                TimeTraceDataList.RemoveAt(0);
+            }
         }
         catch (Exception ex)
         {
@@ -140,7 +156,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         // 9 - 12 - Analog Output Channels(Volts)
         // 13 - 20 - Digital TTL Outputs(as 0 or 1)
         var timeTraceData = new TimeTraceData();
-        timeTraceData.TimestampMs = DateTime.Now.ToOADate();
+        
         for (var i = 0; i < PmtChannelCount; i++)
         {
             var val = Math.Round(_random.NextDouble(), 2);

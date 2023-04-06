@@ -11,17 +11,16 @@
     <DockPanel Name="DataCollectionDockPanel">
         <Border BorderBrush="Black" BorderThickness="2" DockPanel.Dock="Top" Margin="10">
 			<TabControl x:Name="TabControl" >
-                <TabItem Header="Data Collection" VerticalContentAlignment="Center">
-                    <Grid RowDefinitions="*,Auto">
-                        <views:DataControllerView HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    </Grid>
-                </TabItem>
+                <!-- <TabItem Header="Data Collection" VerticalContentAlignment="Center"> -->
+                <!--     <Grid RowDefinitions="*,Auto"> -->
+                <!--         ~1~ <views:DataControllerView HorizontalAlignment="Left" VerticalAlignment="Top"/> @1@ -->
+                <!--     </Grid> -->
+                <!-- </TabItem> -->
                 <TabItem Header="FPGA Time Trace" VerticalContentAlignment="Center">
                     <Grid RowDefinitions="*,Auto">
                         <views:FpgaChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Grid>
                 </TabItem>
-
             </TabControl>
         </Border>
     </DockPanel>
