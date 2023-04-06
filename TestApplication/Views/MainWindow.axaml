@@ -9,7 +9,7 @@
        x:Class="TestLiveCharts.Views.MainWindow"
        Icon="{x:Null}"
        Background="{x:Null}"
-       Width="1150" Height="800"
+       Width="1600" Height="1200"
        WindowStartupLocation="CenterScreen">
     <Window.Styles>
         <Style Selector="TitleBar:fullscreen">

@@ -89,7 +89,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             _timestampStart = 0;
             _runtimeWatch.Restart();
             IsConnected = true;
-            _pollingTimer.Enabled = true;
+            _pollingTimer.Start();
             
         }
         catch (Exception ex)
@@ -106,7 +106,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         }
         try
         {
-            _pollingTimer.Enabled = false;
+            _pollingTimer.Stop();
             // Closes and resets the FPGA device. Must be called at the end of use.
             Thread.Sleep(1000);
         }
