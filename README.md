@@ -1,4 +1,15 @@
-# livechart-avalonia-crash
+# 2023-04   Livecharts2-Performance [ Issue displaying 10000+ points LiveChart 2.0.0.Beta.701, Avalonia 0.10.19]
+
+![image](https://user-images.githubusercontent.com/92173569/230513713-917eb95f-51a9-4219-bf1c-9ced2ccbf0c3.png)
+
+See issue discussion on Livecharts2 : 
+https://github.com/beto-rodriguez/LiveCharts2/discussions/976
+
+
+
+
+
+# Livecharts-avalonia-crash [ Resolved with LiveChart 2.0.0.Beta.300, Avalonia 0.10.19
 
 This is a test application to investigate a sporadic crash ( seconds to hours) happening when using LiveChart and AvaloniaUI.
 The current code use LiveChart 2.0.0.Beta.300 and AvaloniaUI 0.10.16
