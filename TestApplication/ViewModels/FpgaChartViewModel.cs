@@ -180,7 +180,7 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
     [Reactive] public double XMinLimit { get; set; } = 0;
 
     private Stopwatch _sw = new Stopwatch();
-
+    private IObservable<TimeTraceData[]> _obsTimeTraceData;
     public FpgaChartViewModel()
     {
         Activator = new ViewModelActivator();
@@ -229,32 +229,51 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
         // https://www.reactiveui.net/docs/handbook/collections/
         // https://stackoverflow.com/questions/60330908/observablechangeset-wait-until-list-is-ready-before-watching
 
-        var t = Fpga.TimeTraceDataList
-            // Convert the collection to a stream of chunks,
-            // so we have IObservable<IChangeSet<TKey, TValue>>
-            // type also known as the DynamicData monad.
-            .ToObservableChangeSet().Sample(TimeSpan.FromSeconds(1)).Select(x => x)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .SubscribeOn(RxApp.MainThreadScheduler);
+        //2nd option using ChangeEvent
+        // var t = Fpga.TimeTraceDataList
+        //         // Convert the collection to a stream of chunks,
+        //         // so we have IObservable<IChangeSet<TKey, TValue>>
+        //         // type also known as the DynamicData monad.
+        //         .ToObservableChangeSet().Sample(TimeSpan.FromSeconds(1)).Select(x => x)
+        //         .ObserveOn(RxApp.MainThreadScheduler)
+        //         .SubscribeOn(RxApp.MainThreadScheduler);
 
-        this.WhenActivated(async (CompositeDisposable disposables) =>
+        this.WhenActivated(disposables=>
         {
-            t.Subscribe(c =>
-            {
-                if (c.Count > 0)
-                {
-                    var newItems = Fpga.TimeTraceDataList.LastOrDefault();
 
-                    if (newItems != null)
-                    {
-                        DataSeries[0].Values = newItems;
-                        XAxes[0].MinLimit = newItems.First().TimestampMs;
-                        XAxes[0].MaxLimit = newItems.Last().TimestampMs;
-                        Console.Error.WriteLine($"Chart Update Trigger {_sw.ElapsedMilliseconds}");
-                    }
-                }
-            }).DisposeWith(disposables);
+            HandleActivation(disposables);
+            Disposable
+                .Create(() => { /* handle deactivation */ })
+                .DisposeWith(disposables);
         });
+    }
+
+    void HandleActivation(CompositeDisposable disposables)
+    {
+        var t = this.WhenAnyValue(x => x.Fpga.TimeTraceDataRetrieve)
+            .Sample(TimeSpan.FromSeconds(1))
+            .ObserveOn(RxApp.MainThreadScheduler);
+
+        t.Subscribe(c =>
+        {
+            // if (c.Count > 0)
+            // {
+            var newItems = Fpga.TimeTraceDataList.LastOrDefault();
+            UpdateChart(newItems);
+            //}
+        }).DisposeWith(disposables);
+    }
+
+
+    protected virtual void UpdateChart(TimeTraceData[]? data)
+    {
+        if (data != null)
+        {
+            DataSeries[0].Values = data;
+            XAxes[0].MinLimit = data.First().TimestampMs;
+            XAxes[0].MaxLimit = data.Last().TimestampMs;
+            Console.Error.WriteLine($"LVC Chart Update Trigger {_sw.ElapsedMilliseconds}");
+        }
     }
 }
 

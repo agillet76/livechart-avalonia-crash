@@ -22,5 +22,7 @@ public static class ViewModelsBootstrapper
         builder.RegisterType<DataCollectionViewModel>().SingleInstance();
         builder.RegisterType<FpgaChartView>().As<IViewFor<FpgaChartViewModel>>();
         builder.RegisterType<FpgaChartViewModel>().SingleInstance();
+        builder.RegisterType<FpgaScottPlotChartView>().As<IViewFor<FpgaScottPlotChartViewModel>>();
+        builder.RegisterType<FpgaScottPlotChartViewModel>().SingleInstance();
     }
 }

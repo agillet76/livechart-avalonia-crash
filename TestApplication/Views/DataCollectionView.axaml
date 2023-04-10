@@ -16,9 +16,14 @@
                 <!--         ~1~ <views:DataControllerView HorizontalAlignment="Left" VerticalAlignment="Top"/> @1@ -->
                 <!--     </Grid> -->
                 <!-- </TabItem> -->
-                <TabItem Header="FPGA Time Trace" VerticalContentAlignment="Center">
+                <TabItem Header="LiveCharts2" VerticalContentAlignment="Center">
                     <Grid RowDefinitions="*,Auto">
                         <views:FpgaChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="ScottPlot" VerticalContentAlignment="Center">
+                    <Grid RowDefinitions="*,Auto">
+                        <views:FpgaScottPlotChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Grid>
                 </TabItem>
             </TabControl>

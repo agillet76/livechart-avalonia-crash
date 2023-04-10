@@ -55,7 +55,18 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
     }
     private double _runtimeInSeconds;
 
-    public ObservableCollection<TimeTraceData[]> TimeTraceDataList { get; set; } = new();
+    public ulong TimeTraceDataRetrieve
+    {
+        get => _timeTraceDataRetrieve;
+        set
+        {
+            _timeTraceDataRetrieve = value;
+            OnPropertyChanged(nameof(TimeTraceDataRetrieve));
+        }
+    }
+    private ulong _timeTraceDataRetrieve;
+
+    public List<TimeTraceData[]> TimeTraceDataList { get; set; } = new();
 
 
     public SimulatedFpga() 
@@ -81,8 +92,8 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         {
             _runtimeWatch.Reset();
             TimeTraceDataList.Clear();
-           
-            var sw = Stopwatch.StartNew();
+            TimeTraceDataRetrieve = 0;
+             var sw = Stopwatch.StartNew();
             Thread.Sleep(1000);
             sw.Stop();
             RuntimeInSeconds = 0;
@@ -118,6 +129,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         {
             _runtimeWatch.Stop();
             IsConnected = false;
+            TimeTraceDataRetrieve = 0;
         }
     }
 
@@ -140,6 +152,8 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             {
                 TimeTraceDataList.RemoveAt(0);
             }
+
+            TimeTraceDataRetrieve += 1;
         }
         catch (Exception ex)
         {

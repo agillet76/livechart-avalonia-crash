@@ -8,7 +8,8 @@ namespace TestLiveCharts.ViewModels;
 public interface IFpgaDataProvider : INotifyPropertyChanged
 {
     double RuntimeInSeconds { get; }
-    ObservableCollection<TimeTraceData[]> TimeTraceDataList { get; }
+    List<TimeTraceData[]> TimeTraceDataList { get; }
+    ulong TimeTraceDataRetrieve { get; }
     bool IsConnected { get; }
     void Connect();
     void Disconnect();
