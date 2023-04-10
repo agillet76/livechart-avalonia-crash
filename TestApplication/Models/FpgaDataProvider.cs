@@ -19,6 +19,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
     // FPGA is configured with 4 PMT channels PMT1, PMT2, PMT3, PMT4
     // Ideally I will need to display data for each channel , total data points PmtChannelCount * TimeTraceLength
     private const int PmtChannelCount = 4;
+    private object _lock = new object();
 
     public bool Disposed { get; private set; }
 
@@ -135,30 +136,34 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
 
     private void ReadTimeTraceData()
     {
-        try
+        lock (_lock)
         {
-            var convertedDataList = new TimeTraceData[TimeTraceLength];
-
-            //if (TimeTraceDataList.Count > TimeTraceLength * 10) { TimeTraceDataList.Clear(); }
-            for (int i = 0; i < TimeTraceLength; i++)
+            try
             {
-                var timeTraceData = GetTimeTraceData();
-                timeTraceData.TimestampMs = _timestampStart;
-                _timestampStart++;
-                convertedDataList[i]= timeTraceData;
-            }
-            TimeTraceDataList.Add(convertedDataList);
-            if (TimeTraceDataList.Count > _maxDataArrayToRetain)
-            {
-                TimeTraceDataList.RemoveAt(0);
-            }
+                var convertedDataList = new TimeTraceData[TimeTraceLength];
 
-            TimeTraceDataRetrieve += 1;
-        }
-        catch (Exception ex)
-        {
-            var message = "Unable to read the time trace data";
-            throw new ApplicationException(message, ex);
+                //if (TimeTraceDataList.Count > TimeTraceLength * 10) { TimeTraceDataList.Clear(); }
+                for (int i = 0; i < TimeTraceLength; i++)
+                {
+                    var timeTraceData = GetTimeTraceData();
+                    timeTraceData.TimestampMs = _timestampStart;
+                    _timestampStart++;
+                    convertedDataList[i] = timeTraceData;
+                }
+
+                TimeTraceDataList.Add(convertedDataList);
+                if (TimeTraceDataList.Count > _maxDataArrayToRetain)
+                {
+                    TimeTraceDataList.RemoveAt(0);
+                }
+
+                TimeTraceDataRetrieve += 1;
+            }
+            catch (Exception ex)
+            {
+                var message = "Unable to read the time trace data";
+                throw new ApplicationException(message, ex);
+            }
         }
     }
 
