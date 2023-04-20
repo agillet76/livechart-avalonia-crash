@@ -286,34 +286,5 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
         }
         Console.Error.WriteLine($"LVC Chart Update Trigger {_sw.ElapsedMilliseconds}");
     }
-
-
-    // void HandleActivation(CompositeDisposable disposables)
-    // {
-    //     var t = this.WhenAnyValue(x => x.Fpga.TimeTraceDataRetrieve)
-    //         .Sample(TimeSpan.FromSeconds(1))
-    //         .ObserveOn(RxApp.MainThreadScheduler);
-    //
-    //     t.Subscribe(c =>
-    //     {
-    //         // if (c.Count > 0)
-    //         // {
-    //         var newItems = Fpga.TimeTraceDataList.LastOrDefault();
-    //         UpdateChart(newItems);
-    //         //}
-    //     }).DisposeWith(disposables);
-    // }
-    //
-    //
-    protected virtual void UpdateChart(TimeTraceData[]? data)
-    {
-        if (data != null)
-        {
-            DataSeries[0].Values = data;
-            XAxes[0].MinLimit = data.First().TimestampMs;
-            XAxes[0].MaxLimit = data.Last().TimestampMs;
-            Console.Error.WriteLine($"LVC Chart Update Trigger {_sw.ElapsedMilliseconds}");
-        }
-    }
 }
 
