@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -29,10 +29,12 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         set
         {
             _timeTraceLength = value;
+            _nextTimeTraceDataIndex = 0;
+            TimeTraceDataFlatArray = Enumerable.Range(0, _maxDataArrayToRetain * _timeTraceLength).Select(_ => new TimeTraceData(PmtChannelCount)).ToArray();
             OnPropertyChanged(nameof(TimeTraceLength));
         }
     }
-    private int _timeTraceLength = 1000;
+    private int _timeTraceLength = 10000;
 
     public bool IsConnected
     {
@@ -56,6 +58,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
     }
     private double _runtimeInSeconds;
 
+    // list implmentation
     public ulong TimeTraceDataRetrieve
     {
         get => _timeTraceDataRetrieve;
@@ -69,6 +72,19 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
 
     public List<TimeTraceData[]> TimeTraceDataList { get; set; } = new();
 
+    // flat array implementation [optimized memory]
+    public TimeTraceData[] TimeTraceDataFlatArray { get; set; }
+    public int LastTimeTraceDataIndex
+    {
+        get => _lastTimeTraceDataIndex;
+        set
+        {
+            _lastTimeTraceDataIndex = value;
+            OnPropertyChanged(nameof(LastTimeTraceDataIndex));
+        }
+    }
+    private int _lastTimeTraceDataIndex = 0;
+    private int _nextTimeTraceDataIndex = 0;
 
     public SimulatedFpga() 
     {
@@ -79,6 +95,7 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
             AutoReset = true
         };
         _pollingTimer.Elapsed += OnTimerElapsed;
+        TimeTraceDataFlatArray = Enumerable.Range(0, _maxDataArrayToRetain * _timeTraceLength).Select(_ => new TimeTraceData(PmtChannelCount)).ToArray();
     }
 
     private void OnTimerElapsed(object sender, ElapsedEventArgs e)
@@ -140,24 +157,44 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         {
             try
             {
-                var convertedDataList = new TimeTraceData[TimeTraceLength];
+                //var convertedDataList = new TimeTraceData[TimeTraceLength];
 
                 //if (TimeTraceDataList.Count > TimeTraceLength * 10) { TimeTraceDataList.Clear(); }
+                
+
                 for (int i = 0; i < TimeTraceLength; i++)
                 {
-                    var timeTraceData = GetTimeTraceData();
-                    timeTraceData.TimestampMs = _timestampStart;
+                    //var timeTraceData = GetTimeTraceData();
+                    UpdateTimeTraceData(TimeTraceDataFlatArray[_nextTimeTraceDataIndex + i]);
+                    TimeTraceDataFlatArray[_nextTimeTraceDataIndex + i].TimestampMs = _timestampStart;
                     _timestampStart++;
-                    convertedDataList[i] = timeTraceData;
-                }
 
-                TimeTraceDataList.Add(convertedDataList);
-                if (TimeTraceDataList.Count > _maxDataArrayToRetain)
+                    // flat array implementation
+                    //TimeTraceDataFlatArray[_nextTimeTraceDataIndex + i] = timeTraceData;
+                    // List implementation
+                    //convertedDataList[i] = timeTraceData;
+                }
+                LastTimeTraceDataIndex = _nextTimeTraceDataIndex;
+
+
+                if (_lastTimeTraceDataIndex + TimeTraceLength >= TimeTraceDataFlatArray.Length)
                 {
-                    TimeTraceDataList.RemoveAt(0);
+                    _nextTimeTraceDataIndex = 0;
+                }
+                else
+                {
+                    _nextTimeTraceDataIndex += TimeTraceLength;
                 }
 
-                TimeTraceDataRetrieve += 1;
+
+                // List implmentation
+                // TimeTraceDataList.Add(convertedDataList);
+                // if (TimeTraceDataList.Count > _maxDataArrayToRetain)
+                // {
+                //     TimeTraceDataList.RemoveAt(0);
+                // }
+                //
+                // TimeTraceDataRetrieve += 1;
             }
             catch (Exception ex)
             {
@@ -167,6 +204,25 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         }
     }
 
+    private void UpdateTimeTraceData(TimeTraceData data)
+    {
+        // 0 - Timestamp (ms)
+        // 1 - 4 - PMTs(Volts)
+        // 5 - 8 - PMTs(Pre - Median Filter)(Volts)
+        // 9 - 12 - Analog Output Channels(Volts)
+        // 13 - 20 - Digital TTL Outputs(as 0 or 1)
+
+        for (var i = 0; i < PmtChannelCount; i++)
+        {
+            var val = Math.Round(_random.NextDouble(), 2);
+            data.PMTsVolts[i]=val;
+            data.PreFilterPMTsVolts[i] = val;
+        }
+
+        //timeTraceData.AnalogOutputChannlesVolts.AddRange(new double[] { 0, 0, 0, 0 });
+        //timeTraceData.DigitalTTLOutputs.AddRange(new bool[] { true, false, false, false, false, false, false, false });
+    }
+
     private TimeTraceData GetTimeTraceData()
     {
         // 0 - Timestamp (ms)
@@ -174,17 +230,17 @@ public class SimulatedFpga : IFpgaDataProvider, IDisposable
         // 5 - 8 - PMTs(Pre - Median Filter)(Volts)
         // 9 - 12 - Analog Output Channels(Volts)
         // 13 - 20 - Digital TTL Outputs(as 0 or 1)
-        var timeTraceData = new TimeTraceData();
+        var timeTraceData = new TimeTraceData(PmtChannelCount);
         
         for (var i = 0; i < PmtChannelCount; i++)
         {
             var val = Math.Round(_random.NextDouble(), 2);
-            timeTraceData.PMTsVolts.Add(val);
-            timeTraceData.PreFilterPMTsVolts.Add(val);
+            timeTraceData.PMTsVolts[i]=val;
+            timeTraceData.PreFilterPMTsVolts[i]=val;
         }
 
-        timeTraceData.AnalogOutputChannlesVolts.AddRange(new double[] { 0, 0, 0, 0 });
-        timeTraceData.DigitalTTLOutputs.AddRange(new bool[] { true, false, false, false, false, false, false, false });
+        //timeTraceData.AnalogOutputChannlesVolts.AddRange(new double[] { 0, 0, 0, 0 });
+        //timeTraceData.DigitalTTLOutputs.AddRange(new bool[] { true, false, false, false, false, false, false, false });
 
 
         return timeTraceData;

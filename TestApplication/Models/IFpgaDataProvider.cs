@@ -10,6 +10,11 @@ public interface IFpgaDataProvider : INotifyPropertyChanged
     double RuntimeInSeconds { get; }
     List<TimeTraceData[]> TimeTraceDataList { get; }
     ulong TimeTraceDataRetrieve { get; }
+
+    TimeTraceData[] TimeTraceDataFlatArray { get; }
+    int LastTimeTraceDataIndex { get; }
+    
+    int TimeTraceLength { get; }
     bool IsConnected { get; }
     void Connect();
     void Disconnect();

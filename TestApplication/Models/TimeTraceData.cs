@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -18,8 +19,17 @@ namespace TestLiveCharts.Models;
 public class TimeTraceData:ReactiveObject
 {
     [Reactive] public double TimestampMs { get; set; }
-    [Reactive] public ObservableCollection<double> PMTsVolts { get; set; } = new();
-    public List<double> PreFilterPMTsVolts { get; set; } = new();
-    public List<double> AnalogOutputChannlesVolts { get; set; } = new();
-    public List<bool> DigitalTTLOutputs { get; set; } = new();
+    [Reactive] public ObservableCollection<double> PMTsVolts { get; set; } 
+    public List<double> PreFilterPMTsVolts { get; set; } 
+    public List<double> AnalogOutputChannlesVolts { get; set; } 
+    public List<bool> DigitalTTLOutputs { get; set; } 
+
+    public TimeTraceData(int PmtsCount)
+    {
+        PMTsVolts = new ObservableCollection<double>();
+        PMTsVolts.AddRange(Enumerable.Range(0, PmtsCount).Select(_ => 0.0).ToList());
+        PreFilterPMTsVolts = Enumerable.Range(0, PmtsCount).Select(_ => 0.0).ToList();
+        AnalogOutputChannlesVolts = new List<double>(){ 0, 0, 0, 0 };
+        DigitalTTLOutputs= new List<bool> { true, false, false, false, false, false, false, false };
+    }
 }

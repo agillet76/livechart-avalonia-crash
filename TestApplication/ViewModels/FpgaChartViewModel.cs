@@ -6,6 +6,7 @@ using LiveChartsCore;
 using ReactiveUI;
 using SkiaSharp;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reactive.Linq;
 using DynamicData.Binding;
 using LiveChartsCore.SkiaSharpView.Painting.Effects;
@@ -19,9 +20,8 @@ namespace TestLiveCharts.ViewModels;
 
 public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
 {
-    public object DataSync { get; set; }
     public ViewModelActivator Activator { get; }
-    public ObservableCollection<TimeTraceData[]> _latestData { get; set; } = new ();
+    
 
     protected ObservableAsPropertyHelper<bool> isConnected; 
     public bool IsConnected => isConnected.Value;
@@ -180,11 +180,18 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
     [Reactive] public double XMinLimit { get; set; } = 0;
 
     private Stopwatch _sw = new Stopwatch();
-    private IObservable<TimeTraceData[]> _obsTimeTraceData;
+
+    public TimeTraceData[] LatestData { get; set; }
+    public object DataSync { get; private set; }
+
     public FpgaChartViewModel()
     {
         Activator = new ViewModelActivator();
         Fpga = new SimulatedFpga();
+
+        LatestData = new TimeTraceData[Fpga.TimeTraceLength];
+        DataSync = LatestData;
+        DataSeries[0].Values = LatestData;
 
         var isConnectedObs = this.WhenAnyValue(x => x.Fpga.IsConnected).ObserveOn(RxApp.MainThreadScheduler);
         isConnected = isConnectedObs.ToProperty(this, x => x.IsConnected);
@@ -215,7 +222,7 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
                    
                     Fpga.Disconnect();
                     _sw.Stop();
-                    _latestData.Clear();
+                    //LatestData.;
 
                 }).ConfigureAwait(true);
             }
@@ -250,21 +257,59 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
 
     void HandleActivation(CompositeDisposable disposables)
     {
-        var t = this.WhenAnyValue(x => x.Fpga.TimeTraceDataRetrieve)
-            .Sample(TimeSpan.FromSeconds(1))
+        var t = this.WhenAnyValue(x => x.Fpga.LastTimeTraceDataIndex)
+            .Sample(TimeSpan.FromSeconds(1)).SkipWhile(_ =>!Fpga.IsConnected)
             .ObserveOn(RxApp.MainThreadScheduler);
-
+    
         t.Subscribe(c =>
         {
-            // if (c.Count > 0)
-            // {
-            var newItems = Fpga.TimeTraceDataList.LastOrDefault();
-            UpdateChart(newItems);
-            //}
+            UpdateChart(c);
         }).DisposeWith(disposables);
+    }
+    
+    
+    protected virtual void UpdateChart(int startIndexData)
+    {
+        lock(DataSync)
+        {
+            if (Fpga.TimeTraceLength != LatestData.Length)
+            {
+                LatestData = new TimeTraceData[Fpga.TimeTraceLength];
+                DataSync = LatestData;
+                DataSeries[0].Values = LatestData;
+
+            }
+            Array.Copy(Fpga.TimeTraceDataFlatArray, startIndexData, LatestData, 0, Fpga.TimeTraceLength);
+
+            XAxes[0].MinLimit = LatestData.First().TimestampMs;
+            XAxes[0].MaxLimit = LatestData.Last().TimestampMs;
+        }
+       
+        
+        
+        
+        Console.Error.WriteLine($"LVC Chart Update Trigger {_sw.ElapsedMilliseconds}");
+        
     }
 
 
+    // void HandleActivation(CompositeDisposable disposables)
+    // {
+    //     var t = this.WhenAnyValue(x => x.Fpga.TimeTraceDataRetrieve)
+    //         .Sample(TimeSpan.FromSeconds(1))
+    //         .ObserveOn(RxApp.MainThreadScheduler);
+    //
+    //     t.Subscribe(c =>
+    //     {
+    //         // if (c.Count > 0)
+    //         // {
+    //         var newItems = Fpga.TimeTraceDataList.LastOrDefault();
+    //         UpdateChart(newItems);
+    //         //}
+    //     }).DisposeWith(disposables);
+    // }
+    //
+    //
     protected virtual void UpdateChart(TimeTraceData[]? data)
     {
         if (data != null)
