@@ -284,12 +284,7 @@ public class FpgaChartViewModel : ReactiveObject, IActivatableViewModel
             XAxes[0].MinLimit = LatestData.First().TimestampMs;
             XAxes[0].MaxLimit = LatestData.Last().TimestampMs;
         }
-       
-        
-        
-        
         Console.Error.WriteLine($"LVC Chart Update Trigger {_sw.ElapsedMilliseconds}");
-        
     }
 
 
