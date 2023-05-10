@@ -1,0 +1,55 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <StackPanel Spacing="5">        
+        <TextBlock Text="Code Font Family" FontFamily="{StaticResource CodeFontFamily}" />
+      </StackPanel>
+    </Border>
+  </Design.PreviewWith>
+    <Styles.Resources>
+        <Thickness x:Key="PageMargin">40 0 40 0</Thickness>    
+        <FontFamily x:Key="CodeFontFamily">avares://XamlControlsGallery/Assets/Fonts#Source Code Pro</FontFamily>
+    </Styles.Resources>
+
+
+    <Style Selector="TextBlock.code">
+        <Setter Property="FontFamily" Value="{StaticResource CodeFontFamily}" />
+    </Style>
+
+    <Style Selector="NumericUpDown">
+        <Setter Property="Width" Value="130" />
+    </Style>
+
+	<Style Selector="HeaderedContentControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border ZIndex="1" Padding="5,0,5,0"  Margin="5,0,0,0" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+                            <TextBlock TextBlock.FontWeight="Bold" Text="{TemplateBinding Header}" FontSize="20" />
+                        </Border>
+                        <Border Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="0,10,0,0"
+                                BorderBrush="{TemplateBinding Background}"
+                                BorderThickness="1">
+                            <ContentPresenter Content="{TemplateBinding Content}" />
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style Selector="Grid#OverlayGrid">
+        <Setter Property="ZIndex" Value="-1" />
+        <Setter Property="Background" Value="{DynamicResource DialogOverlayBrush}" />
+        <Setter Property="Opacity" Value="0.2" />
+    </Style>
+</Styles>

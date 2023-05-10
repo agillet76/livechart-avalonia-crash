@@ -4,5 +4,8 @@
              >
     <Application.Styles>
 		<FluentTheme Mode="Dark" />
+        <StyleInclude Source="/Styles/Styles.xaml" />
+        <StyleInclude Source="/Styles/SideBar.xaml" />
+        <StyleInclude Source="/Styles/Dialogs.xaml" />
 	</Application.Styles>
 </Application>

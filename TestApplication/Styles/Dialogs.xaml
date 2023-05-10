@@ -1,0 +1,57 @@
+<Styles
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="Window.dialog_window Panel#PART_MinimiseButton">
+        <Setter Property="IsVisible" Value="False"></Setter>
+    </Style>
+    <Style Selector="Window.dialog_window Panel#PART_RestoreButton">
+        <Setter Property="IsVisible" Value="False"></Setter>
+    </Style>
+
+    <Style Selector="Button.dialogButton">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="Margin" Value="20,10" />
+        <Setter Property="Padding" Value="12,5" />
+        <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource DialogButtonForegroundBrush}" />
+    </Style>
+
+    <Style Selector="Button.dialogButton /template/ ContentPresenter">
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <Style Selector="Button.dialogButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush3}" />
+    </Style>
+
+    <Style Selector="Button.dialogButton:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource DialogButtonPressedBrush}" />
+    </Style>
+
+    <Style Selector="TextBlock.dialogTextBlock">
+        <Setter Property="FontFamily" Value="SansSerif" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Margin" Value="0,5" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style Selector="TextBlock.overWriteDialogTextBlock">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style Selector="TextBlock.openWithDialogTextBlock">
+        <Setter Property="FontSize" Value="18" />
+    </Style>
+
+    <Style Selector="TextBlock.boldStyleTextBlock">
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <Style Selector="Border.settingsContentBorder">
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SettingsTabBorderBrush}" />
+    </Style>
+
+</Styles>
