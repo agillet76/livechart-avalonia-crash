@@ -23,7 +23,7 @@
                 </TabItem>
                 <TabItem Header="ScottPlot" VerticalContentAlignment="Center">
                     <Grid RowDefinitions="*,Auto">
-                        <views:FpgaScottPlotChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        <!-- <views:FpgaScottPlotChartView HorizontalAlignment="Left" VerticalAlignment="Top"/> -->
                     </Grid>
                 </TabItem>
             </TabControl>

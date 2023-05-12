@@ -32,7 +32,7 @@
                 <views:DataCollectionView/>
 			</TabItem>
             <TabItem Header="ScatterPlots" VerticalContentAlignment="Center" >
-                
+                <views:ScatterPlotTestView/>
             </TabItem>
         </TabControl>
     </Panel>

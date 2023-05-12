@@ -26,11 +26,11 @@ public partial class FpgaScottPlotChartView : Avalonia.ReactiveUI.ReactiveUserCo
 
         _avaScottPlot = this.Find<AvaPlot>("AvaScottPlot");
 
-        _avaScottPlot.Plot.AddScatter(_timeTraceDataX, _timeTraceDataY,lineWidth:0);
-        _avaScottPlot.Plot.AxisAutoX(margin: 0);
-
-        _avaScottPlot.Plot.XAxis.Label("Time (s)", size: 11);
-        _avaScottPlot.Plot.YAxis.Label("Amplitude [V]", size: 11);
+        // _avaScottPlot.Plot.AddScatter(_timeTraceDataX, _timeTraceDataY,lineWidth:0);
+        // _avaScottPlot.Plot.AxisAutoX(margin: 0);
+        //
+        // _avaScottPlot.Plot.XAxis.Label("Time (s)", size: 11);
+        // _avaScottPlot.Plot.YAxis.Label("Amplitude [V]", size: 11);
         
     }
 
@@ -41,30 +41,30 @@ public partial class FpgaScottPlotChartView : Avalonia.ReactiveUI.ReactiveUserCo
 
     private void OnTimeTraceDataChanged(TimeTraceData[] newTimeTraceData)
     {
-        if(newTimeTraceData == null || newTimeTraceData.Length ==0) return;
-        var sw = Stopwatch.StartNew();
-        var pmt1Array = newTimeTraceData.Select(x => x.PMTsVolts[0]).ToArray();
-        var timeArray = newTimeTraceData.Select(x => x.TimestampMs).ToArray();
-        Console.Error.WriteLine($"Scott Chart Select {sw.ElapsedMilliseconds}");
-        sw.Restart();
-       
-        if (timeArray.Length != _timeTraceDataX.Length)
-        {
-            Array.Resize(ref _timeTraceDataY, pmt1Array.Length);
-            Array.Resize(ref _timeTraceDataX, timeArray.Length);
-            _avaScottPlot.Plot.Clear();
-            _avaScottPlot.Plot.AddScatter(_timeTraceDataX, _timeTraceDataY, lineWidth: 0);
-
-        }
-        Array.Copy(pmt1Array, 0, _timeTraceDataY, 0, _timeTraceDataY.Length);
-        Array.Copy(timeArray, 0, _timeTraceDataX, 0, _timeTraceDataX.Length);
-        Console.Error.WriteLine($"Scott Chart Array Copy {sw.ElapsedMilliseconds}");
-        sw.Restart();
-       
-        _avaScottPlot.Plot.SetAxisLimitsX(timeArray.First(),timeArray.Last());
-        _avaScottPlot.Refresh();
-        Console.Error.WriteLine($"Scott Chart Refresh {sw.ElapsedMilliseconds} \n");
-        sw.Stop();
+        // if(newTimeTraceData == null || newTimeTraceData.Length ==0) return;
+        // var sw = Stopwatch.StartNew();
+        // var pmt1Array = newTimeTraceData.Select(x => x.PMTsVolts[0]).ToArray();
+        // var timeArray = newTimeTraceData.Select(x => x.TimestampMs).ToArray();
+        // Console.Error.WriteLine($"Scott Chart Select {sw.ElapsedMilliseconds}");
+        // sw.Restart();
+        //
+        // if (timeArray.Length != _timeTraceDataX.Length)
+        // {
+        //     Array.Resize(ref _timeTraceDataY, pmt1Array.Length);
+        //     Array.Resize(ref _timeTraceDataX, timeArray.Length);
+        //     _avaScottPlot.Plot.Clear();
+        //     _avaScottPlot.Plot.AddScatter(_timeTraceDataX, _timeTraceDataY, lineWidth: 0);
+        //
+        // }
+        // Array.Copy(pmt1Array, 0, _timeTraceDataY, 0, _timeTraceDataY.Length);
+        // Array.Copy(timeArray, 0, _timeTraceDataX, 0, _timeTraceDataX.Length);
+        // Console.Error.WriteLine($"Scott Chart Array Copy {sw.ElapsedMilliseconds}");
+        // sw.Restart();
+        //
+        // _avaScottPlot.Plot.SetAxisLimitsX(timeArray.First(),timeArray.Last());
+        // _avaScottPlot.Refresh();
+        // Console.Error.WriteLine($"Scott Chart Refresh {sw.ElapsedMilliseconds} \n");
+        // sw.Stop();
     }
 }
 

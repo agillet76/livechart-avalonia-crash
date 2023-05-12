@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
@@ -49,14 +49,15 @@
     <!--Condition below is needed to remove Avalonia.DiagnostTestLiveCharts package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.19" />
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.701" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.701" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-beta.701" />
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
     <PackageReference Include="ReactiveUI" Version="18.4.26" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.26" />
-    <PackageReference Include="ScottPlot" Version="4.1.62" />
-    <PackageReference Include="ScottPlot.Avalonia" Version="4.1.62" />
+    <PackageReference Include="ScottPlot" Version="4.1.63" />
+    <PackageReference Include="ScottPlot.Avalonia" Version="4.1.63" />
     <PackageReference Include="Splat.Autofac" Version="14.6.8" />
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +76,12 @@
 	  <Page Include="Styles\Styles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
+	  <Compile Update="Views\DropletScottPlotChartView.axaml.cs">
+	    <DependentUpon>DropletScottPlotChartView.axaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\ScatterPlotTestView.axaml.cs">
+	    <DependentUpon>ScatterPlotTestView.axaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\DataView.axaml.cs">
 	    <DependentUpon>DataView.axaml</DependentUpon>
 	  </Compile>
