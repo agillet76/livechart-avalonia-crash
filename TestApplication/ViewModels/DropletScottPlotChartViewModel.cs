@@ -1,6 +1,5 @@
 ﻿using CsvHelper;
 using ReactiveUI;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reactive;
@@ -30,7 +29,6 @@ public enum PeakMeasureType
 
 public class DropletScottPlotChartViewModel : FpgaChartViewModel
 {
-
     protected Action<List<DropletData>> _updateDropletsDataAction;
     private Stopwatch _sw = new ();
 
@@ -43,12 +41,14 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
     [Reactive] public AxisType AxisY { get; set; } = AxisType.PMT2;
     [Reactive] public PeakMeasureType PeakMeasure { get; set; } = PeakMeasureType.Peak;
     [Reactive] public bool IsDataLoaded { get; set; } = false;
+    public string Title { get; set; } = "Polygon A";    
     public  ScottPlot.Avalonia.AvaPlot AvaPlot { get; set; }
 
-    private List<DropletData> currentDropletsData;
+    private List<DropletData> _currentDropletsData;
 
     public DropletScottPlotChartViewModel()
     {
+        
         var canExecute = this.WhenAnyValue(
             x => x.IsDataLoaded, isLoaded=> !isLoaded);
 
@@ -59,7 +59,7 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
                 await Task.Run(() =>
                 {
                     // load a csv file representing the Droplet data
-                    currentDropletsData = LoadData();
+                    _currentDropletsData = LoadData();
                     IsDataLoaded = true;
 
                     UpdateChart();
@@ -95,28 +95,97 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
 
     protected void  UpdateChart()
     {
-        AvaPlot.Plot.Title("Polygon A");
-        AvaPlot.Plot.XAxis.Label("PMT1 Max [V]", size: 11);
-        AvaPlot.Plot.YAxis.Label("PMT2 Max [V]", size: 11);
-        if (IsDataLoaded) OnDropletsDataChanged(currentDropletsData);
+        AvaPlot.Plot.Title(Title);
+        var (labelX,labelY) = GetAxisLabel();
+        AvaPlot.Plot.XAxis.Label(labelX, size: 11);
+        AvaPlot.Plot.YAxis.Label(labelY, size: 11);
+        if (IsDataLoaded) OnDropletsDataChanged();
         AvaPlot.Refresh();
-        Console.Error.WriteLine($"ScottPlot Chart Update Trigger {_sw.ElapsedMilliseconds}");
-        
     }
 
-    private void OnDropletsDataChanged(List<DropletData> dropletsData)
+    private (string,string) GetAxisLabel()
+    {
+        var unitX = GetAxisLabelUnit(AxisX);
+        var unitY = GetAxisLabelUnit(AxisX);
+        var peakMeasure = GetAxisLabelPeakMeasure(PeakMeasure);
+        var labelX = $"{AxisX} {peakMeasure} {unitX}";
+        var labelY = $"{AxisY} {peakMeasure} {unitY}";
+        return(labelX,labelY);
+    }
+
+    private string GetAxisLabelPeakMeasure(PeakMeasureType peakMeasure)
+    {
+        return peakMeasure switch
+        {
+            PeakMeasureType.Peak => "Max",
+            PeakMeasureType.PeakRaw => "Max Unsmoothed",
+            PeakMeasureType.Avg => "Average",
+            PeakMeasureType.AvgRaw => "Average Unsmoothed",
+            _ => throw new ArgumentOutOfRangeException(nameof(peakMeasure), $"Not expected axis type value: {peakMeasure}"),
+        };
+    }
+    private string GetAxisLabelUnit(AxisType axis)
+    {
+        return axis switch
+        {
+            AxisType.Ratio => "",
+            AxisType.PMT1 => "[V]",
+            AxisType.PMT2 => "[V]",
+            _ => throw new ArgumentOutOfRangeException(nameof(axis), $"Not expected axis type value: {axis}"),
+        };
+    }
+
+    private double[] GetAxisData(AxisType axis)
+    {
+        switch (axis)
+        {
+            case AxisType.PMT1:
+                return PeakMeasure switch
+                {
+                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.Avg1InVolts).ToArray(),
+                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.AvgUnfilter1InVolts).ToArray(),
+                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.Max1InVolts).ToArray(),
+                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.MaxUnfilter1InVolts).ToArray(),
+                };
+            case AxisType.PMT2:
+                return PeakMeasure switch
+                {
+                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.Avg2InVolts).ToArray(),
+                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.AvgUnfilter2InVolts).ToArray(),
+                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.Max2InVolts).ToArray(),
+                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.MaxUnfilter2InVolts).ToArray(),
+                };
+            case AxisType.Ratio:
+                return PeakMeasure switch
+                {
+                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.RatioAvg).ToArray(),
+                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.RatioAvgUnfilter).ToArray(),
+                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.RatioMax).ToArray(),
+                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.RatioMaxUnfilter).ToArray(),
+                };
+            default:
+                throw new ArgumentOutOfRangeException(nameof(axis), $"Not expected axis type value: {axis}");
+        }
+    }
+
+
+    private void OnDropletsDataChanged()
     {
         var binsX = 1500;
         var binsY = 1500;
         var min = 0.0;
         var max = 5.0;
 
+        var arrayX = GetAxisData(AxisX);
+        var arrayY = GetAxisData(AxisY);
+
+
         // Calculate the bin edges for the x and y axes
         var histX = new ScottPlot.Statistics.Histogram(min, max, binsX);
-        histX.AddRange(dropletsData.Select(p => p.Max1InVolts));
+        histX.AddRange(arrayX);
         double[] xEdges = histX.Bins;
         var histY = new ScottPlot.Statistics.Histogram(min, max, binsY);
-        histY.AddRange(dropletsData.Select(p => p.Max2InVolts));
+        histY.AddRange(arrayY);
         double[] yEdges = histY.Bins;
 
         // Create an empty 2D array to store the bin counts
@@ -126,13 +195,13 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
 
 
         // Loop through each point and increment the appropriate bin
-        foreach (var point in dropletsData)
+        for(var i=0;i< arrayX.Length;i++)
         {
-            int xBin = Array.BinarySearch(xEdges, point.Max1InVolts);
+            int xBin = Array.BinarySearch(xEdges, arrayX[i]);
             if (xBin < 0)
                 xBin = ~xBin - 1;
 
-            int yBin = Array.BinarySearch(yEdges, point.Max2InVolts);
+            int yBin = Array.BinarySearch(yEdges, arrayY[i]);
             if (yBin < 0)
                 yBin = ~yBin - 1;
             counts[yBin, xBin] ??= 0;
