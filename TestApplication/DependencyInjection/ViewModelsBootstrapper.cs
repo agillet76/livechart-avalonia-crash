@@ -27,7 +27,9 @@ public static class ViewModelsBootstrapper
         
         builder.RegisterType<ScatterPlotTestView>().As<IViewFor<ScatterPlotTestViewModel>>();
         builder.RegisterType<ScatterPlotTestViewModel>().SingleInstance();
-        builder.RegisterType<DropletScottPlotChartView>().As<IViewFor<DropletScottPlotChartViewModel>>();
-        builder.RegisterType<DropletScottPlotChartViewModel>().SingleInstance();
+        builder.RegisterType<DropletScatterPlotView>().As<IViewFor<DropletScatterPlotViewModel>>();
+        builder.RegisterType<DropletScatterPlotViewModel>().InstancePerDependency();
+
+        builder.RegisterType<DropletsDataService>().As<IDropletsDataService>().SingleInstance();
     }
 }

@@ -1,3 +1,6 @@
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
@@ -9,6 +12,7 @@ namespace TestLiveCharts.Views
 {
     public partial class ScatterPlotTestView : ReactiveUserControl<ScatterPlotTestViewModel>
     {
+        private DropletScatterPlotView ScatterPlot => this.Find<DropletScatterPlotView>("ScatterPlot");
         public ScatterPlotTestView()
         { 
             InitializeComponent();
@@ -20,7 +24,7 @@ namespace TestLiveCharts.Views
             // ViewModel's WhenActivated block will also get called.
             this.WhenActivated(disposables =>
             {
-                /* Handle view activation etc. */
+                this.OneWayBind(ViewModel, vm => vm.PolygonA, view => view.ScatterPlot.PolygonItem).DisposeWith(disposables);
             });
             AvaloniaXamlLoader.Load(this);
         }

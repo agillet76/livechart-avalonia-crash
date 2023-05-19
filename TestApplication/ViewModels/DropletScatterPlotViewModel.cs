@@ -1,15 +1,13 @@
-﻿using CsvHelper;
-using ReactiveUI;
-using System.Diagnostics;
-using System.Globalization;
-using System.Reactive;
+﻿using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using ReactiveUI;
+using DynamicData.Binding;
 using ReactiveUI.Fody.Helpers;
 using TestLiveCharts.Models;
-using System.Reactive.Disposables;
+
 
 namespace TestLiveCharts.ViewModels;
-
 
 public enum AxisType
 {
@@ -27,12 +25,12 @@ public enum PeakMeasureType
     AvgRaw
 }
 
-public class DropletScottPlotChartViewModel : FpgaChartViewModel
+public class DropletScatterPlotViewModel : ReactiveObject, IActivatableViewModel
 {
+    public ViewModelActivator Activator { get; }
+
     protected Action<List<DropletData>> _updateDropletsDataAction;
     private Stopwatch _sw = new ();
-
-    public ReactiveCommand<Unit, Unit> LoadDataCommand { get; }
 
     public Array PeakMeasureSupported => Enum.GetValues(typeof(PeakMeasureType));
     public Array AxisTypeSupported => Enum.GetValues(typeof(AxisType));
@@ -40,39 +38,16 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
     [Reactive]public AxisType AxisX { get; set; } = AxisType.PMT1;
     [Reactive] public AxisType AxisY { get; set; } = AxisType.PMT2;
     [Reactive] public PeakMeasureType PeakMeasure { get; set; } = PeakMeasureType.Peak;
-    [Reactive] public bool IsDataLoaded { get; set; } = false;
-    public string Title { get; set; } = "Polygon A";    
+
+    [Reactive] public Polygon Polygon { get; set; } = new();
     public  ScottPlot.Avalonia.AvaPlot AvaPlot { get; set; }
 
-    private List<DropletData> _currentDropletsData;
+    private readonly IDropletsDataService _dropletsDataService;
 
-    public DropletScottPlotChartViewModel()
+    public DropletScatterPlotViewModel(IDropletsDataService dropletsDataService)
     {
-        
-        var canExecute = this.WhenAnyValue(
-            x => x.IsDataLoaded, isLoaded=> !isLoaded);
-
-        LoadDataCommand = ReactiveCommand.CreateFromTask(async () =>
-        {
-            try
-            {
-                await Task.Run(() =>
-                {
-                    // load a csv file representing the Droplet data
-                    _currentDropletsData = LoadData();
-                    IsDataLoaded = true;
-
-                    UpdateChart();
-
-
-                }).ConfigureAwait(true);
-            }
-            catch (Exception)
-            {
-                Console.Error.WriteLine("Failed Start Monitoring");
-            }
-        }, canExecute);
-        
+        _dropletsDataService = dropletsDataService;
+        Activator = new ViewModelActivator();
 
         this.WhenActivated((CompositeDisposable disposables) =>
         {
@@ -82,6 +57,16 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
                 .Subscribe(_ => UpdateChart())
                 .DisposeWith(disposables);
 
+            var changeSet = dropletsDataService.DropletsData.ToObservableChangeSet();
+            changeSet.Subscribe(changes =>
+            {
+                // Console.WriteLine("Collection changed!");
+                // foreach (var change in changes)
+                // {
+                //     Console.WriteLine($"Change: {change.Range}");
+                // }
+                UpdateChart();
+            });
 
             Disposable
                 .Create(() =>
@@ -95,11 +80,12 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
 
     protected void  UpdateChart()
     {
-        AvaPlot.Plot.Title(Title);
+        if (AvaPlot.Plot == null) return;
+        //AvaPlot.Plot.Title(Polygon.Name);
         var (labelX,labelY) = GetAxisLabel();
         AvaPlot.Plot.XAxis.Label(labelX, size: 11);
         AvaPlot.Plot.YAxis.Label(labelY, size: 11);
-        if (IsDataLoaded) OnDropletsDataChanged();
+        if (_dropletsDataService.DropletsData?.Count >0) OnDropletsDataChanged();
         AvaPlot.Refresh();
     }
 
@@ -142,26 +128,26 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
             case AxisType.PMT1:
                 return PeakMeasure switch
                 {
-                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.Avg1InVolts).ToArray(),
-                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.AvgUnfilter1InVolts).ToArray(),
-                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.Max1InVolts).ToArray(),
-                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.MaxUnfilter1InVolts).ToArray(),
+                    PeakMeasureType.Avg => _dropletsDataService.DropletsData.Select(p => p.Avg1InVolts).ToArray(),
+                    PeakMeasureType.AvgRaw => _dropletsDataService.DropletsData.Select(p => p.AvgUnfilter1InVolts).ToArray(),
+                    PeakMeasureType.Peak => _dropletsDataService.DropletsData.Select(p => p.Max1InVolts).ToArray(),
+                    PeakMeasureType.PeakRaw => _dropletsDataService.DropletsData.Select(p => p.MaxUnfilter1InVolts).ToArray(),
                 };
             case AxisType.PMT2:
                 return PeakMeasure switch
                 {
-                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.Avg2InVolts).ToArray(),
-                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.AvgUnfilter2InVolts).ToArray(),
-                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.Max2InVolts).ToArray(),
-                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.MaxUnfilter2InVolts).ToArray(),
+                    PeakMeasureType.Avg => _dropletsDataService.DropletsData.Select(p => p.Avg2InVolts).ToArray(),
+                    PeakMeasureType.AvgRaw => _dropletsDataService.DropletsData.Select(p => p.AvgUnfilter2InVolts).ToArray(),
+                    PeakMeasureType.Peak => _dropletsDataService.DropletsData.Select(p => p.Max2InVolts).ToArray(),
+                    PeakMeasureType.PeakRaw => _dropletsDataService.DropletsData.Select(p => p.MaxUnfilter2InVolts).ToArray(),
                 };
             case AxisType.Ratio:
                 return PeakMeasure switch
                 {
-                    PeakMeasureType.Avg => _currentDropletsData.Select(p => p.RatioAvg).ToArray(),
-                    PeakMeasureType.AvgRaw => _currentDropletsData.Select(p => p.RatioAvgUnfilter).ToArray(),
-                    PeakMeasureType.Peak => _currentDropletsData.Select(p => p.RatioMax).ToArray(),
-                    PeakMeasureType.PeakRaw => _currentDropletsData.Select(p => p.RatioMaxUnfilter).ToArray(),
+                    PeakMeasureType.Avg => _dropletsDataService.DropletsData.Select(p => p.RatioAvg).ToArray(),
+                    PeakMeasureType.AvgRaw => _dropletsDataService.DropletsData.Select(p => p.RatioAvgUnfilter).ToArray(),
+                    PeakMeasureType.Peak => _dropletsDataService.DropletsData.Select(p => p.RatioMax).ToArray(),
+                    PeakMeasureType.PeakRaw => _dropletsDataService.DropletsData.Select(p => p.RatioMaxUnfilter).ToArray(),
                 };
             default:
                 throw new ArgumentOutOfRangeException(nameof(axis), $"Not expected axis type value: {axis}");
@@ -221,16 +207,6 @@ public class DropletScottPlotChartViewModel : FpgaChartViewModel
         AvaPlot.Plot.SetAxisLimits(min, max, min, max);
         AvaPlot.Plot.XAxis.SetBoundary(min, max);
         AvaPlot.Plot.YAxis.SetBoundary(min, max);
-    }
-
-    private List<DropletData> LoadData()
-    {
-        using (var reader = new StreamReader(@"C:\Users\Alexandre\Desktop\DropletsData\droplets_5min.csv"))
-        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-        {
-            var records = csv.GetRecords<DropletData>().ToList();
-            return records;
-        }
     }
 }
 

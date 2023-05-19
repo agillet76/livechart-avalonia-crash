@@ -3,37 +3,47 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:views="clr-namespace:TestLiveCharts.Views"
+             xmlns:models="clr-namespace:TestLiveCharts.Models"
+             xmlns:viewModels="clr-namespace:TestLiveCharts.ViewModels"
              mc:Ignorable="d"
              d:DesignWidth="800" d:DesignHeight="450"
              x:Class="TestLiveCharts.Views.ScatterPlotTestView">
 
 
     <Grid RowDefinitions="Auto,Auto, Auto" ColumnDefinitions="Auto,auto">
-
-		<StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" x:Name="FpgaControlButtonsPanel"
-                    Orientation="Horizontal" Margin="15,0">
-
-            <!-- <Button x:Name="ConnectButton" Content="Connect" -->
-            <!--         Command="{Binding ConnectCommand}" -->
-            <!--         HorizontalContentAlignment="Center" Width="100" Margin="15,20"/> -->
-           
-        </StackPanel>
+        <Button Grid.Row="0" Grid.Column="0" x:Name="ConnectButton" Content="Load Data"
+                Command="{Binding LoadDataCommand}"
+                HorizontalContentAlignment="Center" Width="100" Margin="15,20"/>
 
 		<Border Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" BorderBrush="Black" BorderThickness="2"  Margin="10">
 
             <TabControl x:Name="TabControl" >
                 <TabItem Header="ScottPlot" VerticalContentAlignment="Center">
-                    <Grid RowDefinitions="*,Auto">
-                        <views:DropletScottPlotChartView HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    </Grid>
+                    <!-- <views:DropletScatterPlotView  x:Name="ScatterPlot"  HorizontalAlignment="Left" VerticalAlignment="Top"/> -->
+                    <!-- PolygonName="{Binding PolygonAName, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" -->
                 </TabItem>
-                <TabItem Header="Plotly.Net" VerticalContentAlignment="Center">
-                    <Grid RowDefinitions="*,Auto">
-                        <!-- <views:FpgaScottPlotChartView HorizontalAlignment="Left" VerticalAlignment="Top"/> -->
-                    </Grid>
+
+
+                <TabItem Header="ItemsControl" VerticalContentAlignment="Center">
+                    <ItemsControl  Margin="10,10,0,0"
+                                   Items="{Binding Polygons}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical" Margin="10">
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <views:DropletScatterPlotView PolygonItem="{Binding}" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </TabItem>
             </TabControl>
         </Border>
 	</Grid>
-
 </UserControl>

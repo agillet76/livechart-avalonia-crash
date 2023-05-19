@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+             x:Class="TestLiveCharts.Views.DropletScatterPlotView"
+             mc:Ignorable="d" d:DesignWidth="2400" d:DesignHeight="1600" 
+             >
+
+    <Grid x:Name="DropletScottPlotMainGrid" RowDefinitions="Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,Auto,Auto,*" Margin="10,10">
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
+                <TextBlock Text="X Axis" TextAlignment="Left" Grid.Row="0" Grid.Column="0"/>
+				<ComboBox x:Name="AxisXComboBox" Grid.Row="1" Grid.Column="0"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                          Items="{Binding AxisTypeSupported}"
+                          SelectedItem="{Binding AxisX}"/>
+                <TextBlock Text="Y Axis" TextAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                <ComboBox x:Name="AxisYComboBox" Grid.Row="1" Grid.Column="1"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                          Items="{Binding AxisTypeSupported}"
+                          SelectedItem="{Binding AxisY}"/>
+                <TextBlock Text="Peak Measure" TextAlignment="Left" Grid.Row="0" Grid.Column="2"/>
+                <ComboBox x:Name="PeakMeasureComboBox" Grid.Row="1" Grid.Column="2"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                          Items="{Binding PeakMeasureSupported}"
+                          SelectedItem="{Binding PeakMeasure}"/>
+        </Grid>
+        <Border BorderBrush="White"  Width="760" Height="640" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="2" Margin="10">
+            <StackPanel Orientation="Vertical">
+                <avalonia:AvaPlot x:Name="DropletPlot" Width="760" Height="640" HorizontalAlignment="Left"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -28,12 +28,13 @@
 		</DockPanel>
        
 		<TabControl x:Name="TabControl" Classes="sidebar" Margin="0 40 0 20">
-			<TabItem Header="TimeSeries" VerticalContentAlignment="Center" >
-                <views:DataCollectionView/>
-			</TabItem>
-            <TabItem Header="ScatterPlots" VerticalContentAlignment="Center" >
+            <TabItem TabIndex="0" Header="ScatterPlots" VerticalContentAlignment="Center" >
                 <views:ScatterPlotTestView/>
             </TabItem>
+            <TabItem TabIndex="1" Header="TimeSeries" VerticalContentAlignment="Center" >
+                <views:DataCollectionView/>
+			</TabItem>
+           
         </TabControl>
     </Panel>
 </UserControl>

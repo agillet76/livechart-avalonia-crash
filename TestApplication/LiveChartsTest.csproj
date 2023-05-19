@@ -76,8 +76,8 @@
 	  <Page Include="Styles\Styles.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
-	  <Compile Update="Views\DropletScottPlotChartView.axaml.cs">
-	    <DependentUpon>DropletScottPlotChartView.axaml</DependentUpon>
+	  <Compile Update="Views\DropletScatterPlotView.axaml.cs">
+	    <DependentUpon>DropletScatterPlotView.axaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\ScatterPlotTestView.axaml.cs">
 	    <DependentUpon>ScatterPlotTestView.axaml</DependentUpon>
