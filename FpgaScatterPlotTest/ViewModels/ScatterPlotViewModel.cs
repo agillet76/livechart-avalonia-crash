@@ -1,13 +1,19 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ReactiveUI;
 using DynamicData.Binding;
+using FpgaScatterPlotTest.Models;
+using FpgaScatterPlotTest.Services;
+using FpgaScatterPlotTest.ViewModels;
 using ReactiveUI.Fody.Helpers;
-using TestLiveCharts.Models;
 
 
-namespace TestLiveCharts.ViewModels;
+
+namespace FpgaScatterPlotTest.ViewModels;
 
 public enum AxisType
 {
@@ -25,7 +31,7 @@ public enum PeakMeasureType
     AvgRaw
 }
 
-public class DropletScatterPlotViewModel : ReactiveObject, IActivatableViewModel
+public class ScatterPlotViewModel : ViewModelBase, IActivatableViewModel
 {
     public ViewModelActivator Activator { get; }
 
@@ -41,13 +47,13 @@ public class DropletScatterPlotViewModel : ReactiveObject, IActivatableViewModel
 
     [Reactive] public Polygon? Polygon { get; set; }
     [Reactive] public string? PolygonName { get; set; }
-    public  ScottPlot.Avalonia.AvaPlot AvaPlot { get; set; }
+    public  ScottPlot.Avalonia.AvaPlot  AvaPlot { get; set; }
 
     private readonly IDropletsDataService _dropletsDataService;
 
-    public DropletScatterPlotViewModel(IDropletsDataService dropletsDataService)
+    public ScatterPlotViewModel()
     {
-        _dropletsDataService = dropletsDataService;
+        _dropletsDataService = new DropletsDataService();
         Activator = new ViewModelActivator();
 
         this.WhenActivated((CompositeDisposable disposables) =>
@@ -59,7 +65,7 @@ public class DropletScatterPlotViewModel : ReactiveObject, IActivatableViewModel
                 .Subscribe(_ => UpdateChart())
                 .DisposeWith(disposables);
 
-            var changeSet = dropletsDataService.DropletsData.ToObservableChangeSet();
+            var changeSet = _dropletsDataService.DropletsData.ToObservableChangeSet();
             changeSet.Skip(1).Subscribe(changes =>
             {
                 // Console.WriteLine("Collection changed!");

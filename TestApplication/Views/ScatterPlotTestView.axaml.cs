@@ -24,7 +24,7 @@ namespace TestLiveCharts.Views
             // ViewModel's WhenActivated block will also get called.
             this.WhenActivated(disposables =>
             {
-                this.OneWayBind(ViewModel, vm => vm.PolygonA, view => view.ScatterPlot.PolygonItem).DisposeWith(disposables);
+                //this.OneWayBind(ViewModel, vm => vm.PolygonA, view => view.ScatterPlot.PolygonItem).DisposeWith(disposables);
             });
             AvaloniaXamlLoader.Load(this);
         }

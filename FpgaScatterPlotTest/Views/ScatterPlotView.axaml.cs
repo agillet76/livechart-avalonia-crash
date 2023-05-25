@@ -4,34 +4,35 @@ using Avalonia.Controls.Mixins;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using FpgaScatterPlotTest.Models;
+using FpgaScatterPlotTest.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ScottPlot.Avalonia;
+
 using Splat;
-using TestLiveCharts.ViewModels;
-using TestLiveCharts.Models;
 
 
-namespace TestLiveCharts.Views;
+namespace FpgaScatterPlotTest.Views;
 
-public partial class DropletScatterPlotView : ReactiveUserControl<DropletScatterPlotViewModel>
+public partial class ScatterPlotView : ReactiveUserControl<ScatterPlotViewModel>
 {
     private AvaPlot _avaPlot => this.Find<AvaPlot>("DropletPlot");
     private ComboBox _axisXComboBox => this.Find<ComboBox>("AxisXComboBox");
     private ComboBox _axisYComboBox => this.Find<ComboBox>("AxisYComboBox");
     private ComboBox _peakMeasureComboBox => this.Find<ComboBox>("PeakMeasureComboBox");
     
-    public DropletScatterPlotView()
+    public ScatterPlotView()
     {
         
         
         InitializeComponent();
-        DataContext = Locator.Current.GetService<DropletScatterPlotViewModel>();
+        DataContext = Locator.Current.GetService<ScatterPlotViewModel>();
         //ViewModel.AvaPlot = _avaPlot;
     }
 
     public static readonly StyledProperty<Polygon> PolygonItemProperty =
-        AvaloniaProperty.Register<DropletScatterPlotView, Polygon>(nameof(PolygonItem),
+        AvaloniaProperty.Register<ScatterPlotView, Polygon>(nameof(PolygonItem),
             defaultValue:null,
             defaultBindingMode: BindingMode.TwoWay);
 
@@ -46,7 +47,7 @@ public partial class DropletScatterPlotView : ReactiveUserControl<DropletScatter
     }
 
     public static readonly StyledProperty<string> PolygonNameProperty =
-        AvaloniaProperty.Register<DropletScatterPlotView, string>(nameof(PolygonName),
+        AvaloniaProperty.Register<ScatterPlotView, string>(nameof(PolygonName),
             defaultValue: null,
             defaultBindingMode: BindingMode.OneWay);
 
@@ -62,8 +63,8 @@ public partial class DropletScatterPlotView : ReactiveUserControl<DropletScatter
     }
 
 
-    public static readonly DirectProperty<DropletScatterPlotView, string> MyPropProperty =
-        AvaloniaProperty.RegisterDirect<DropletScatterPlotView, string>(
+    public static readonly DirectProperty<ScatterPlotView, string> MyPropProperty =
+        AvaloniaProperty.RegisterDirect<ScatterPlotView, string>(
             nameof(MyProp),
             o => o.MyProp,
             (o, v) => o.MyProp = v);

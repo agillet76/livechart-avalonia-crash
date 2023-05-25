@@ -1,31 +1,33 @@
 using System.Collections.ObjectModel;
 using ReactiveUI;
 using System.Reactive;
-using CsvHelper;
-using System.Globalization;
-using DynamicData;
-using ICS.Common;
 using TestLiveCharts.Models;
 using ReactiveUI.Fody.Helpers;
+using Splat.ModeDetection;
+using DynamicData.Binding;
+using System.Reactive.Disposables;
 
 namespace TestLiveCharts.ViewModels;
 
-public class ScatterPlotTestViewModel : ReactiveObject
+public class ScatterPlotTestViewModel : ReactiveObject, IActivatableViewModel
 {
+    public ViewModelActivator Activator { get; }
     public ReactiveCommand<Unit, Unit> LoadDataCommand { get; }
     public ObservableCollection<Polygon> Polygons { get; set; } 
 
-    [Reactive] public Polygon PolygonA { get; set; } = new() {Name = "PolygonAT"};
+    [Reactive] public Polygon PolygonA { get; set; } 
     private ObservableCollection<DropletScatterPlotViewModel> PolygonViewModels { get; set; } = new ();
 
 
     private readonly IDropletsDataService _dropletsDataService;
     public ScatterPlotTestViewModel(IDropletsDataService dropletsDataService)
     {
+        Activator = new ViewModelActivator();
         _dropletsDataService = dropletsDataService;
+        PolygonA = new Polygon() { Name = "TestPolygon"};
         Polygons = new ObservableCollection<Polygon>()
         {
-            PolygonA, new Polygon(){Name = "PolygonB"}
+            new Polygon(){Name = "PolygonB"}, new Polygon(){Name = "PolygonC"}
 
         };
         var canExecute = this.WhenAnyValue(
@@ -51,6 +53,21 @@ public class ScatterPlotTestViewModel : ReactiveObject
                 Console.Error.WriteLine("Failed Start Monitoring");
             }
         }, canExecute);
+        this.WhenActivated((CompositeDisposable disposables) =>
+        {
+            /* handle activation */
+
+           
+
+            Disposable
+                .Create(() =>
+                {
+                    /* handle deactivation */
+                    //Camera.StopAcquisition();
+                })
+                .DisposeWith(disposables);
+        });
     }
 }
+
 
