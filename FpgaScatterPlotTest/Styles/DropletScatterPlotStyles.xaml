@@ -1,0 +1,41 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:customsControls="clr-namespace:FpgaScatterPlotTest.CustomsControls"
+        xmlns:avalonia="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <customsControls:DropletScatterPlot Header="Hello"></customsControls:DropletScatterPlot>
+        </Border>
+    </Design.PreviewWith>
+
+    <!--DropletScatterPlot-->
+    <Style Selector="customsControls|DropletScatterPlot">
+        <Setter Property="Template">
+            <ControlTemplate>
+
+                <Grid x:Name="DropletScottPlotMainGrid" RowDefinitions="Auto,Auto,Auto,Auto,*" ColumnDefinitions="Auto,Auto,Auto,*" Margin="10,10">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" Margin="10,0" 
+                               VerticalAlignment="Center" HorizontalAlignment="Center" Classes="h2" Text="{TemplateBinding Header}"/>
+                    
+                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*" Margin="10">
+                        <TextBlock Text="X Axis" TextAlignment="Left" Grid.Row="0" Grid.Column="0"/>
+                        <ComboBox x:Name="AxisXComboBox" Grid.Row="1" Grid.Column="0"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                                  Items="{Binding AxisTypeSupported, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"
+                                  SelectedItem="{Binding AxisX, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"/>
+                        <TextBlock Text="Y Axis" TextAlignment="Left" Grid.Row="0" Grid.Column="1"/>
+                        <ComboBox x:Name="AxisYComboBox" Grid.Row="1" Grid.Column="1"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                                  Items="{Binding AxisTypeSupported, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"
+                                  SelectedItem="{Binding AxisY, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"/>
+                        <TextBlock Text="Peak Measure" TextAlignment="Left" Grid.Row="0" Grid.Column="2"/>
+                        <ComboBox x:Name="PeakMeasureComboBox" Grid.Row="1" Grid.Column="2"  Width="100" Margin="0,10" HorizontalAlignment="Left"
+                                  Items="{Binding PeakMeasureSupported, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"
+                                  SelectedItem="{Binding PeakMeasure, RelativeSource={RelativeSource AncestorType=customsControls:DropletScatterPlot}}"/>
+                    </Grid>
+
+                    <avalonia:AvaPlot x:Name="DropletPlot"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"  Width="760" Height="640" 
+                                      HorizontalAlignment="Left"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>

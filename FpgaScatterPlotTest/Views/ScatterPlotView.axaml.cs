@@ -17,8 +17,7 @@ namespace FpgaScatterPlotTest.Views;
 
 public partial class ScatterPlotView : ReactiveUserControl<ScatterPlotViewModel>
 {
-    private AvaPlot _avaPlot => this.Find<AvaPlot>("DropletPlot");
-    private ComboBox _axisXComboBox => this.Find<ComboBox>("AxisXComboBox");
+    private AvaPlot _avaPlot => this.Find<AvaPlot>("DropletPlot"); ComboBox _axisXComboBox => this.Find<ComboBox>("AxisXComboBox");
     private ComboBox _axisYComboBox => this.Find<ComboBox>("AxisYComboBox");
     private ComboBox _peakMeasureComboBox => this.Find<ComboBox>("PeakMeasureComboBox");
     

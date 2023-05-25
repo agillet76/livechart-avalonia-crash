@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:FpgaScatterPlotTest.Views"
+        xmlns:customsControls="clr-namespace:FpgaScatterPlotTest.CustomsControls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FpgaScatterPlotTest.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
@@ -17,12 +18,17 @@
 
     <StackPanel Orientation="Vertical" >
         <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <views:MyUserControl MyProp="{Binding Greeting}" Width="600" Height="600"/>
-        <!-- <views:ScatterPlotView  x:Name="ScatterPlot" -->
-        <!--                                PolygonItem="{Binding PolygonA, Mode=TwoWay}" -->
-        <!--                                PolygonName="{Binding PolygonA.Name, Mode=TwoWay}" -->
-        <!--                                MyProp ="{Binding PolygonA.Name, Mode=TwoWay}" -->
-        <!--                                HorizontalAlignment="Left" VerticalAlignment="Top"/> -->
+        
+        <Button Grid.Row="0" Grid.Column="0" x:Name="ConnectButton" Content="Load Data"
+                Command="{Binding LoadDataCommand }"
+                HorizontalContentAlignment="Center" Width="100" Margin="10,10"/>
+
+        <customsControls:DropletScatterPlot  x:Name="ScatterPlot"
+                                             Header="Test123" 
+                                             PolygonItem="{Binding PolygonA, Mode=TwoWay}"
+                                             DropletDataProvider="{Binding _dropletsDataService , Mode=TwoWay}"
+                                             HorizontalAlignment="Center" VerticalAlignment="Center"
+                                             Margin="10"/>
 
 	</StackPanel>
    
