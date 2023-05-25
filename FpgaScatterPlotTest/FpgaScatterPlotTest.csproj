@@ -41,11 +41,5 @@
     <Compile Update="CustomControls\DropletScatterPlot.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
-    <Compile Update="Views\MyUserControl.axaml.cs">
-      <DependentUpon>MyUserControl.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ScatterPlotView.axaml.cs">
-      <DependentUpon>ScatterPlotView.axaml</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>

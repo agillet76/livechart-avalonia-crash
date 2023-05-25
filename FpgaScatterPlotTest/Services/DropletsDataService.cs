@@ -7,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using FpgaScatterPlotTest.Models;
-using System;
 
 namespace FpgaScatterPlotTest.Services;
 
@@ -15,7 +14,6 @@ public interface IDropletsDataService
 {
     bool IsDataLoaded { get; set; }
     RangeObservableCollection<DropletData>? DropletsData { get; set; }
-    event EventHandler DataChanged;
     void LoadData();
 }
 
@@ -24,11 +22,6 @@ public class DropletsDataService: ReactiveObject, IDropletsDataService
     [Reactive] public bool IsDataLoaded { get; set; } = false;
     [Reactive] public RangeObservableCollection<DropletData>? DropletsData { get; set; } = new();
 
-    public event EventHandler DataChanged = delegate { };
-    public DropletsDataService()
-    {
-      
-    }
 
     public void LoadData()
     {
@@ -38,7 +31,6 @@ public class DropletsDataService: ReactiveObject, IDropletsDataService
         {
             var records = csv.GetRecords<DropletData>().ToList();
             DropletsData.ReplaceRange(records);
-            DataChanged(this, EventArgs.Empty);
             IsDataLoaded = true;
         }
     }

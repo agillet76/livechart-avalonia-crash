@@ -1,15 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
+using System.Reactive.Disposables;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
 using DynamicData.Binding;
 using FpgaScatterPlotTest.Models;
 using FpgaScatterPlotTest.Services;
-using FpgaScatterPlotTest.Views;
 using ReactiveUI;
 using ScottPlot.Avalonia;
 
@@ -33,7 +31,7 @@ public enum PeakMeasureType
     AvgRaw
 }
 
-public class DropletScatterPlot:TemplatedControl
+public class DropletScatterPlot:TemplatedControl, IActivatableView
 {
 
     public Array PeakMeasureSupported => Enum.GetValues(typeof(PeakMeasureType));
@@ -68,7 +66,6 @@ public class DropletScatterPlot:TemplatedControl
         get { return GetValue(PeakMeasureProperty); }
         set { SetValue(PeakMeasureProperty, value); }
     }
-
 
     public static readonly StyledProperty<Polygon> PolygonItemProperty =
         AvaloniaProperty.Register<DropletScatterPlot, Polygon>(
@@ -107,6 +104,31 @@ public class DropletScatterPlot:TemplatedControl
 
     private AvaPlot? _avaPlot { get; set; }
 
+    public ViewModelActivator Activator { get; } = new ViewModelActivator();
+
+    public DropletScatterPlot()
+    {
+        this.WhenActivated((CompositeDisposable disposables) =>
+        {
+            /* handle activation */
+
+            var changeSet = _dropletDataProvider.DropletsData.ToObservableChangeSet();
+            changeSet.Subscribe(changes =>
+            {
+                UpdateChart();
+            });
+
+            Disposable
+                .Create(() =>
+                {
+                    /* handle deactivation */
+                    //Camera.StopAcquisition();
+                })
+                .DisposeWith(disposables);
+        });
+    }
+
+
     // We override what happens when the control template is being applied. 
     // That way we can for example listen to events of controls which are part of the template
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -115,11 +137,8 @@ public class DropletScatterPlot:TemplatedControl
 
         // try to find the control with the given name
         _avaPlot = e.NameScope.Find("DropletPlot") as AvaPlot;
-        _dropletDataProvider.DataChanged += new EventHandler(OnDropletDataChanged);
         UpdateChart();
     }
-
-    private void OnDropletDataChanged(object sender, EventArgs e) => UpdateChart();
 
     // We override OnPropertyChanged of the base class. That way we can react on property changes
     protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)

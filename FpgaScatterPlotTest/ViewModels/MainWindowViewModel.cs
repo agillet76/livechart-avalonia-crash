@@ -21,10 +21,6 @@ namespace FpgaScatterPlotTest.ViewModels
             var canExecute = this.WhenAnyValue(
                 x => x._dropletsDataService.IsDataLoaded, isLoaded => !isLoaded);
 
-            // foreach (var polygon in Polygons)
-            // {
-            //     PolygonViewModels.Add(new DropletScottPlotChartViewModel(polygon));
-            // }
 
             LoadDataCommand = ReactiveCommand.CreateFromTask(async () =>
             {
